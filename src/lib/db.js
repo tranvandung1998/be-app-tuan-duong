@@ -2,12 +2,10 @@
 import { Pool } from 'pg';
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'dbapp',
-  password: '123456',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // cần thiết khi connect từ Vercel hoặc public Railway
+  },
 });
 
 export default pool;
-
