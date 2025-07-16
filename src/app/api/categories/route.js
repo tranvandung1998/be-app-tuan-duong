@@ -1,26 +1,23 @@
-import pool from '@/lib/db';
-
-export async function GET() {
-  try {
-    const result = await pool.query('SELECT * FROM categories ORDER BY id');
-    return Response.json(result.rows);
-  } catch (err) {
-    return new Response('Error loading categories', { status: 500 });
-  }
-}
+// src/app/api/subcategories/route.js
+import pool from "@/lib/db";
 
 export async function POST(req) {
   try {
-    const { name } = await req.json();
-    if (!name) return new Response('Missing name', { status: 400 });
+    const body = await req.json();
+    const { name, category_id } = body;
+
+    if (!name || !category_id) {
+      return new Response("Missing fields", { status: 400 });
+    }
 
     const result = await pool.query(
-      'INSERT INTO categories (name) VALUES ($1) RETURNING *',
-      [name]
+      `INSERT INTO subcategories (name, category_id) VALUES ($1, $2) RETURNING *`,
+      [name, category_id]
     );
 
     return Response.json(result.rows[0]);
   } catch (err) {
-    return new Response('Error creating category', { status: 500 });
+    console.error("Error creating subcategory:", err);
+    return new Response("Internal Server Error", { status: 500 });
   }
 }
