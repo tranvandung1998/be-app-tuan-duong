@@ -1,3 +1,4 @@
+// app/api/products/route.js
 import pool from '@/lib/db';
 
 export async function GET(req) {
@@ -29,6 +30,7 @@ export async function POST(req) {
 
     return Response.json(result.rows[0]);
   } catch (err) {
+    console.error('❌ Lỗi tạo sản phẩm:', err);
     return new Response('Error creating product', { status: 500 });
   }
 }
