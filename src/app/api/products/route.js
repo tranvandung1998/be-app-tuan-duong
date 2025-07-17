@@ -1,4 +1,3 @@
-// app/api/products/route.js
 import pool from '@/lib/db';
 
 export async function GET(req) {
@@ -12,25 +11,33 @@ export async function GET(req) {
 
     return Response.json(result.rows);
   } catch (err) {
+    console.error('GET error:', err);
     return new Response('Error loading products', { status: 500 });
   }
 }
 
 export async function POST(req) {
   try {
-    const { subcategory_id, name, price, description, images } = await req.json();
-    if (!subcategory_id || !name || !images || images.length === 0)
-      return new Response('Missing fields', { status: 400 });
+    const { name, price, description, images, subcategory_id } = await req.json();
 
-    const result = await pool.query(
-      `INSERT INTO products (subcategory_id, name, price, description, images, created_at)
-       VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *`,
-      [subcategory_id, name, price || 0, description || '', images]
-    );
+    if (!name || !subcategory_id) {
+      return NextResponse.json({ error: "Thiếu trường bắt buộc" }, { status: 400 });
+    }
 
-    return Response.json(result.rows[0]);
-  } catch (err) {
-    console.error('❌ Lỗi tạo sản phẩm:', err);
-    return new Response('Error creating product', { status: 500 });
+    const product = await prisma.products.create({
+      data: {
+        name,
+        price,
+        description,
+        images, // nên kiểm tra là array
+        subcategory_id
+      }
+    });
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error("❌ Error creating product:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
+
 }
