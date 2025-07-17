@@ -1,6 +1,5 @@
 // src/app/api/subcategories/route.js
-import pool from "@/lib/db";
-
+import pool from "../../../lib/db"
 export async function POST(req) {
   try {
     const body = await req.json();
