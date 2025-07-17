@@ -9,35 +9,37 @@ export async function GET(req) {
       ? await pool.query('SELECT * FROM products WHERE subcategory_id = $1 ORDER BY id DESC', [subId])
       : await pool.query('SELECT * FROM products ORDER BY id DESC');
 
-    return Response.json(result.rows);
+    return new Response(JSON.stringify(result.rows), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err) {
-    console.error('GET error:', err);
-    return new Response('Error loading products', { status: 500 });
+    console.error('GET Error:', err);
+    return new Response(err.message || 'Error loading products', { status: 500 });
   }
 }
 
 export async function POST(req) {
   try {
-    const { name, price, description, images, subcategory_id } = await req.json();
+    const body = await req.json();
+    const { subcategory_id, name, price, description, images } = body;
 
-    if (!name || !subcategory_id) {
-      return NextResponse.json({ error: "Thiếu trường bắt buộc" }, { status: 400 });
+    if (!subcategory_id || !name || !images || images.length === 0) {
+      return new Response('Missing required fields', { status: 400 });
     }
 
-    const product = await prisma.products.create({
-      data: {
-        name,
-        price,
-        description,
-        images, // nên kiểm tra là array
-        subcategory_id
-      }
+    const result = await pool.query(
+      `INSERT INTO products (subcategory_id, name, price, description, images, created_at)
+       VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *`,
+      [subcategory_id, name, price || 0, description || '', images]
+    );
+
+    return new Response(JSON.stringify(result.rows[0]), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' },
     });
-
-    return NextResponse.json(product);
-  } catch (error) {
-    console.error("❌ Error creating product:", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (err) {
+    console.error('POST Error:', err);
+    return new Response(err.message || 'Error creating product', { status: 500 });
   }
-
 }
