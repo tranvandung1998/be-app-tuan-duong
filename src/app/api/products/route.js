@@ -1,15 +1,18 @@
 import pool from '../../../lib/db';
 import { handleCors } from '../../../lib/cors';
 
-export async function OPTIONS(req) {
-  return handleCors(req); // Xử lý preflight request
+// OPTIONS: trả về CORS headers luôn
+export function OPTIONS(req) {
+  return handleCors(req); // sẽ trả về Response nếu là method OPTIONS
 }
 
+// GET handler
 export async function GET(req) {
-  const corsHeaders = handleCors(req);
+  const corsHeaders = handleCors(req); // nhận về headers object
 
   try {
     const result = await pool.query('SELECT * FROM products ORDER BY id DESC');
+
     return new Response(JSON.stringify(result.rows), {
       status: 200,
       headers: {
@@ -25,6 +28,7 @@ export async function GET(req) {
   }
 }
 
+// POST handler
 export async function POST(req) {
   const corsHeaders = handleCors(req);
 

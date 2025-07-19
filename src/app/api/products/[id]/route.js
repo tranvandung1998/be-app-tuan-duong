@@ -1,8 +1,8 @@
 import pool from '../../../../lib/db';
 import { handleCors } from '../../../../lib/cors';
 
-export async function GET(_, { params }) {
-  const corsHeaders = handleCors();
+export async function GET(req, { params }) {
+  const corsHeaders = handleCors(req); // ✅ truyền req
 
   const { id } = params;
 
@@ -31,9 +31,6 @@ export async function GET(_, { params }) {
   }
 }
 
-export function OPTIONS() {
-  return new Response(null, {
-    status: 204,
-    headers: handleCors(),
-  });
+export function OPTIONS(req) {
+  return handleCors(req); // ✅ đúng cách xử lý CORS preflight
 }

@@ -2,7 +2,7 @@ import pool from "../../../lib/db";
 import { handleCors } from "../../../lib/cors";
 
 export async function POST(req) {
-  const corsHeaders = handleCors();
+  const corsHeaders = handleCors(req); // ✅ Phải truyền `req` vào
 
   try {
     const body = await req.json();
@@ -30,9 +30,9 @@ export async function POST(req) {
   }
 }
 
-export function OPTIONS() {
+export function OPTIONS(req) {
   return new Response(null, {
     status: 204,
-    headers: handleCors(),
+    headers: handleCors(req), // ✅ truyền `req`
   });
 }

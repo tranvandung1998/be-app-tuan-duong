@@ -2,8 +2,7 @@ import pool from '../../../../lib/db';
 import { handleCors } from '../../../../lib/cors';
 
 export async function GET(req) {
-  const corsHeaders = handleCors(req);
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
+  const corsHeaders = handleCors(req); // ✅ truyền đúng req
 
   const { searchParams } = new URL(req.url);
   const categoryId = searchParams.get('categoryId');
@@ -52,9 +51,7 @@ export async function GET(req) {
   }
 }
 
+// ✅ Xử lý preflight request (CORS) đúng cách
 export function OPTIONS(req) {
-  return new Response(null, {
-    status: 204,
-    headers: handleCors(req),
-  });
+  return handleCors(req);
 }

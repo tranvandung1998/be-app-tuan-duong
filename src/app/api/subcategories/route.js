@@ -2,7 +2,7 @@ import pool from '../../../lib/db';
 import { handleCors } from '../../../lib/cors';
 
 export async function GET(req) {
-  const corsHeaders = handleCors();
+  const corsHeaders = handleCors(req); // ✅ truyền req
   const { searchParams } = new URL(req.url);
   const categoryId = searchParams.get('categoryId');
 
@@ -28,7 +28,7 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  const corsHeaders = handleCors();
+  const corsHeaders = handleCors(req); // ✅ truyền req
   try {
     const { category_id, name } = await req.json();
     if (!category_id || !name)
@@ -55,9 +55,9 @@ export async function POST(req) {
   }
 }
 
-export function OPTIONS() {
+export function OPTIONS(req) {
   return new Response(null, {
     status: 204,
-    headers: handleCors(),
+    headers: handleCors(req), // ✅ truyền req
   });
 }
