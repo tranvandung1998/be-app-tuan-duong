@@ -1,15 +1,14 @@
 // lib/cors.js
 export function handleCors(req) {
-  const origin = req.headers.get('origin') || '*';
+  const allowedOrigin = 'http://localhost:5173'; // Sửa cứng origin DEV
 
   const headers = {
-    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Credentials': 'true',
   };
 
-  // Trả về response nếu là OPTIONS (preflight)
   if (req.method === 'OPTIONS') {
     return {
       isOptions: true,
@@ -20,7 +19,6 @@ export function handleCors(req) {
     };
   }
 
-  // Với các method khác
   return {
     isOptions: false,
     headers,
