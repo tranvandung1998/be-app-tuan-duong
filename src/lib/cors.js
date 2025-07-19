@@ -1,6 +1,11 @@
-// lib/cors.js
+const whitelist = [
+  'http://localhost:5173', // ✅ Cho phép FE chạy local
+  'https://app-fe-tuan-duong.vercel.app', // ✅ Cho phép FE production
+];
+
 export function handleCors(req) {
-  const allowedOrigin = 'http://localhost:5173'; // Sửa cứng origin DEV
+  const origin = req.headers.get('origin') || '';
+  const allowedOrigin = whitelist.includes(origin) ? origin : '';
 
   const headers = {
     'Access-Control-Allow-Origin': allowedOrigin,
