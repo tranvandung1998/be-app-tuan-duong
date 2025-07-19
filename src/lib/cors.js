@@ -11,15 +11,6 @@ export function getCorsHeaders(origin = '*') {
 }
 
 export function handleCors(request) {
-  const origin = request.headers.get('origin') || '*';
-  const headers = getCorsHeaders(origin);
-
-  if (request.method === 'OPTIONS') {
-    return new NextResponse(null, {
-      status: 204,
-      headers,
-    });
-  }
-
-  return headers;
+  const origin = request?.headers?.get('origin') || '*'; // LẤY TỪ request
+  return getCorsHeaders(origin);
 }
