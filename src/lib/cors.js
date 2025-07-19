@@ -1,3 +1,4 @@
+// lib/cors.js
 import { NextResponse } from 'next/server';
 
 export function getCorsHeaders(origin = '*') {
@@ -20,5 +21,5 @@ export function handleCors(request) {
     });
   }
 
-  return headers; 
+  return headers;
 }
