@@ -1,8 +1,19 @@
+import pool from '../../../lib/db';
+import { handleCors } from '../../../lib/cors';
+
 export async function GET(req) {
+  const corsHeaders = handleCors(req);
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
+
   const { searchParams } = new URL(req.url);
   const categoryId = searchParams.get('categoryId');
 
-  if (!categoryId) return new Response('Missing categoryId', { status: 400 });
+  if (!categoryId) {
+    return new Response('Missing categoryId', {
+      status: 400,
+      headers: corsHeaders,
+    });
+  }
 
   try {
     const subRes = await pool.query(
@@ -25,8 +36,25 @@ export async function GET(req) {
       });
     }
 
-    return Response.json(data);
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (err) {
-    return new Response('Error fetching grouped products', { status: 500 });
+    console.error('GET grouped products error:', err);
+    return new Response('Error fetching grouped products', {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
+}
+
+export function OPTIONS(req) {
+  return new Response(null, {
+    status: 204,
+    headers: handleCors(req),
+  });
 }
