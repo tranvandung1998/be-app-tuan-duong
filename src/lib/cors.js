@@ -20,5 +20,5 @@ export function handleCors(request) {
     });
   }
 
-  return headers; // headers dùng cho các method khác
+  return headers; 
 }
