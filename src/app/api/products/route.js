@@ -1,9 +1,12 @@
 import pool from '../../../lib/db';
 import { handleCors } from '../../../lib/cors';
 
+export function OPTIONS(req) {
+  return handleCors(req); // CORS preflight handled here
+}
+
 export async function GET(req) {
   const corsHeaders = handleCors(req);
-  if (req.method === 'OPTIONS') return corsHeaders;
 
   try {
     const result = await pool.query('SELECT * FROM products ORDER BY id DESC');
@@ -25,7 +28,6 @@ export async function GET(req) {
 
 export async function POST(req) {
   const corsHeaders = handleCors(req);
-  if (req.method === 'OPTIONS') return corsHeaders;
 
   try {
     const body = await req.json();
@@ -57,9 +59,4 @@ export async function POST(req) {
       headers: corsHeaders,
     });
   }
-}
-
-// Add this to handle preflight requests
-export function OPTIONS(req) {
-  return handleCors(req);
 }
