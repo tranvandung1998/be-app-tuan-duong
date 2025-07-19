@@ -2,7 +2,11 @@ import pool from '../../../lib/db';
 import { handleCors } from '../../../lib/cors';
 
 export function OPTIONS(req) {
-  return handleCors(req); // CORS preflight handled here
+  const corsHeaders = handleCors(req);
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
 }
 
 export async function GET(req) {
@@ -10,7 +14,6 @@ export async function GET(req) {
 
   try {
     const result = await pool.query('SELECT * FROM products ORDER BY id DESC');
-
     return new Response(JSON.stringify(result.rows), {
       status: 200,
       headers: {
