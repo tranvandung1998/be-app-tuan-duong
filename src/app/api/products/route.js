@@ -1,7 +1,8 @@
 import pool from '../../../lib/db';
 import { handleCors } from '../../../lib/cors';
 
-// OPTIONS: luôn trả về response cho preflight
+export const runtime = 'nodejs';
+
 export function OPTIONS(req) {
   const { response } = handleCors(req);
   return response;

@@ -1,17 +1,15 @@
 // lib/cors.js
-export function getCorsHeaders(origin = '*') {
-  return {
+export function handleCors(req) {
+  const origin = req.headers.get('origin') || '*';
+
+  const headers = {
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Credentials': 'true',
   };
-}
 
-export function handleCors(req) {
-  const origin = req.headers.get('origin') || '*';
-  const headers = getCorsHeaders(origin);
-
+  // Trả về response nếu là OPTIONS (preflight)
   if (req.method === 'OPTIONS') {
     return {
       isOptions: true,
@@ -19,10 +17,10 @@ export function handleCors(req) {
         status: 204,
         headers,
       }),
-      headers,
     };
   }
 
+  // Với các method khác
   return {
     isOptions: false,
     headers,
