@@ -8,19 +8,23 @@ export function getCorsHeaders(origin = '*') {
   };
 }
 
-// Trả về Response nếu là OPTIONS, còn lại thì trả về headers object
 export function handleCors(req) {
   const origin = req.headers.get('origin') || '*';
   const headers = getCorsHeaders(origin);
 
   if (req.method === 'OPTIONS') {
-    // Trả luôn Response cho request OPTIONS
-    return new Response(null, {
-      status: 204,
+    return {
+      isOptions: true,
+      response: new Response(null, {
+        status: 204,
+        headers,
+      }),
       headers,
-    });
+    };
   }
 
-  // Với các method khác thì trả headers để dùng trong Response
-  return headers;
+  return {
+    isOptions: false,
+    headers,
+  };
 }

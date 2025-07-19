@@ -1,36 +1,36 @@
 import pool from '../../../lib/db';
 import { handleCors } from '../../../lib/cors';
 
-// OPTIONS: trả về CORS headers luôn
+// OPTIONS: luôn trả về response cho preflight
 export function OPTIONS(req) {
-  return handleCors(req); // sẽ trả về Response nếu là method OPTIONS
+  const { response } = handleCors(req);
+  return response;
 }
 
-// GET handler
 export async function GET(req) {
-  const corsHeaders = handleCors(req); // nhận về headers object
+  const { isOptions, response, headers } = handleCors(req);
+  if (isOptions) return response;
 
   try {
     const result = await pool.query('SELECT * FROM products ORDER BY id DESC');
-
     return new Response(JSON.stringify(result.rows), {
       status: 200,
       headers: {
-        ...corsHeaders,
+        ...headers,
         'Content-Type': 'application/json',
       },
     });
   } catch (err) {
     return new Response('Error loading products', {
       status: 500,
-      headers: corsHeaders,
+      headers,
     });
   }
 }
 
-// POST handler
 export async function POST(req) {
-  const corsHeaders = handleCors(req);
+  const { isOptions, response, headers } = handleCors(req);
+  if (isOptions) return response;
 
   try {
     const body = await req.json();
@@ -39,7 +39,7 @@ export async function POST(req) {
     if (!subcategory_id || !name || !images?.length) {
       return new Response('Missing required fields', {
         status: 400,
-        headers: corsHeaders,
+        headers,
       });
     }
 
@@ -52,14 +52,14 @@ export async function POST(req) {
     return new Response(JSON.stringify(result.rows[0]), {
       status: 201,
       headers: {
-        ...corsHeaders,
+        ...headers,
         'Content-Type': 'application/json',
       },
     });
   } catch (err) {
     return new Response('Error creating product', {
       status: 500,
-      headers: corsHeaders,
+      headers,
     });
   }
 }
