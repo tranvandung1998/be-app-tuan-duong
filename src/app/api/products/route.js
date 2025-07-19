@@ -1,12 +1,8 @@
 import pool from '../../../lib/db';
 import { handleCors } from '../../../lib/cors';
 
-export function OPTIONS(req) {
-  const corsHeaders = handleCors(req);
-  return new Response(null, {
-    status: 204,
-    headers: corsHeaders,
-  });
+export async function OPTIONS(req) {
+  return handleCors(req); // Xử lý preflight request
 }
 
 export async function GET(req) {
