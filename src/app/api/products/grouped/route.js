@@ -1,5 +1,5 @@
-import pool from '../../../lib/db';
-import { handleCors } from '../../../lib/cors';
+import pool from '../../../../lib/db';
+import { handleCors } from '../../../../lib/cors';
 
 export async function GET(req) {
   const corsHeaders = handleCors(req);
