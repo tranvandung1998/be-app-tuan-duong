@@ -1,15 +1,32 @@
-import pool from "../../../lib/db";
-import { handleCors } from "../../../lib/cors";
+import pool from '../../../lib/db';
 
+export const runtime = 'nodejs'; // nếu cần cho Vercel hiểu rõ môi trường
+
+// ✅ CORS preflight
+export function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*', // hoặc FE domain cụ thể
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
+// ✅ POST: Tạo subcategory
 export async function POST(req) {
-  const corsHeaders = handleCors(req); // ✅ Phải truyền `req` vào
-
   try {
     const body = await req.json();
     const { name, category_id } = body;
 
     if (!name || !category_id) {
-      return new Response("Missing fields", { status: 400, headers: corsHeaders });
+      return new Response('Missing fields', {
+        status: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
     }
 
     const result = await pool.query(
@@ -20,19 +37,17 @@ export async function POST(req) {
     return new Response(JSON.stringify(result.rows[0]), {
       status: 201,
       headers: {
-        ...corsHeaders,
+        'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
     });
   } catch (err) {
-    console.error("Error creating subcategory:", err);
-    return new Response("Internal Server Error", { status: 500, headers: corsHeaders });
+    console.error('Error creating subcategory:', err);
+    return new Response('Internal Server Error', {
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   }
-}
-
-export function OPTIONS(req) {
-  return new Response(null, {
-    status: 204,
-    headers: handleCors(req), // ✅ truyền `req`
-  });
 }

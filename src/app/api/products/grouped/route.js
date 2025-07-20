@@ -1,16 +1,30 @@
 import pool from '../../../../lib/db';
-import { handleCors } from '../../../../lib/cors';
 
+export const runtime = 'nodejs';
+
+// ✅ Xử lý preflight CORS
+export function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*', // hoặc FE domain cụ thể
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
+// ✅ API chính - GET grouped products
 export async function GET(req) {
-  const corsHeaders = handleCors(req); // ✅ truyền đúng req
-
   const { searchParams } = new URL(req.url);
   const categoryId = searchParams.get('categoryId');
 
   if (!categoryId) {
     return new Response('Missing categoryId', {
       status: 400,
-      headers: corsHeaders,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   }
 
@@ -38,7 +52,7 @@ export async function GET(req) {
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: {
-        ...corsHeaders,
+        'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
     });
@@ -46,12 +60,9 @@ export async function GET(req) {
     console.error('GET grouped products error:', err);
     return new Response('Error fetching grouped products', {
       status: 500,
-      headers: corsHeaders,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   }
-}
-
-// ✅ Xử lý preflight request (CORS) đúng cách
-export function OPTIONS(req) {
-  return handleCors(req);
 }
