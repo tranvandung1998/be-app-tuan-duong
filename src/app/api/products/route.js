@@ -1,38 +1,44 @@
 import pool from '../../../lib/db';
-import { handleCors } from '../../../lib/cors';
 
 export const runtime = 'nodejs';
 
-export function OPTIONS(req) {
-  const { response } = handleCors(req);
-  return response;
+// ✅ Handle preflight (CORS OPTIONS)
+export function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*', // Hoặc FE domain cụ thể
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }
 
-export async function GET(req) {
-  const { isOptions, response, headers } = handleCors(req);
-  if (isOptions) return response;
-
+// ✅ GET products
+export async function GET() {
   try {
     const result = await pool.query('SELECT * FROM products ORDER BY id DESC');
+
     return new Response(JSON.stringify(result.rows), {
       status: 200,
       headers: {
-        ...headers,
+        'Access-Control-Allow-Origin': '*', // FE domain cũng được
         'Content-Type': 'application/json',
       },
     });
   } catch (err) {
+    console.error('GET error', err);
     return new Response('Error loading products', {
       status: 500,
-      headers,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   }
 }
 
+// ✅ POST new product
 export async function POST(req) {
-  const { isOptions, response, headers } = handleCors(req);
-  if (isOptions) return response;
-
   try {
     const body = await req.json();
     const { subcategory_id, name, price, description, images } = body;
@@ -40,7 +46,9 @@ export async function POST(req) {
     if (!subcategory_id || !name || !images?.length) {
       return new Response('Missing required fields', {
         status: 400,
-        headers,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
       });
     }
 
@@ -53,14 +61,17 @@ export async function POST(req) {
     return new Response(JSON.stringify(result.rows[0]), {
       status: 201,
       headers: {
-        ...headers,
+        'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
     });
   } catch (err) {
+    console.error('POST error', err);
     return new Response('Error creating product', {
       status: 500,
-      headers,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   }
 }
