@@ -1,20 +1,28 @@
 // lib/cors.js
-import Cors from 'cors';
 
-// Khởi tạo middleware
-const cors = Cors({
-  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  origin: '*', // Hoặc chỉ định domain cụ thể
-});
+const ALLOWED_ORIGIN = '*'; // Hoặc '*' nếu thử cho tất cả
 
-function runMiddleware(req, res, fn) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, result => {
-      if (result instanceof Error) return reject(result);
-      return resolve(result);
-    });
-  });
+export function handleCors(req) {
+  const headers = {
+    'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
+  // Handle preflight (OPTIONS)
+  if (req.method === 'OPTIONS') {
+    return {
+      isOptions: true,
+      response: new Response(null, {
+        status: 204,
+        headers,
+      }),
+      headers,
+    };
+  }
+
+  return {
+    isOptions: false,
+    headers,
+  };
 }
-
-export default runMiddleware;
-export { cors };
