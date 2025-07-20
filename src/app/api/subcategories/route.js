@@ -33,10 +33,11 @@ export async function GET(req) {
     });
   } catch (err) {
     console.error('GET subcategories error:', err);
-    return new Response('Error loading subcategories', {
+    return new Response(JSON.stringify({ error: 'Error loading subcategories' }), {
       status: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
       },
     });
   }
@@ -48,10 +49,11 @@ export async function POST(req) {
     const { category_id, name } = await req.json();
 
     if (!category_id || !name) {
-      return new Response('Missing fields', {
+      return new Response(JSON.stringify({ error: 'Missing fields' }), {
         status: 400,
         headers: {
           'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
         },
       });
     }
@@ -70,10 +72,11 @@ export async function POST(req) {
     });
   } catch (err) {
     console.error('POST subcategory error:', err);
-    return new Response('Error creating subcategory', {
+    return new Response(JSON.stringify({ error: 'Error creating subcategory' }), {
       status: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
       },
     });
   }

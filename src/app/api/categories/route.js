@@ -1,30 +1,31 @@
 import pool from '../../../lib/db';
 
-export const runtime = 'nodejs'; // nếu cần cho Vercel hiểu rõ môi trường
+export const runtime = 'nodejs'; // BẮT BUỘC để tránh bị CORS khi dùng Edge Function
 
-// ✅ CORS preflight
+// ✅ Xử lý preflight request từ trình duyệt
 export function OPTIONS() {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*', // hoặc FE domain cụ thể
+      'Access-Control-Allow-Origin': '*', // Thay bằng domain cụ thể khi production
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
 }
 
-// ✅ POST: Tạo subcategory
+// ✅ Xử lý POST request để tạo subcategory
 export async function POST(req) {
   try {
     const body = await req.json();
     const { name, category_id } = body;
 
     if (!name || !category_id) {
-      return new Response('Missing fields', {
+      return new Response(JSON.stringify({ error: 'Missing fields' }), {
         status: 400,
         headers: {
           'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
         },
       });
     }
@@ -43,10 +44,11 @@ export async function POST(req) {
     });
   } catch (err) {
     console.error('Error creating subcategory:', err);
-    return new Response('Internal Server Error', {
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
       },
     });
   }

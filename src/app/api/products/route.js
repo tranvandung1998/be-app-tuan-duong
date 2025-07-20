@@ -7,7 +7,7 @@ export function OPTIONS() {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*', 
+      'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
@@ -22,16 +22,17 @@ export async function GET() {
     return new Response(JSON.stringify(result.rows), {
       status: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*', // FE domain cũng được
+        'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
     });
   } catch (err) {
     console.error('GET error', err);
-    return new Response('Error loading products', {
+    return new Response(JSON.stringify({ error: 'Error loading products' }), {
       status: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
       },
     });
   }
@@ -44,10 +45,11 @@ export async function POST(req) {
     const { subcategory_id, name, price, description, images } = body;
 
     if (!subcategory_id || !name || !images?.length) {
-      return new Response('Missing required fields', {
+      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: {
           'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
         },
       });
     }
@@ -67,10 +69,11 @@ export async function POST(req) {
     });
   } catch (err) {
     console.error('POST error', err);
-    return new Response('Error creating product', {
+    return new Response(JSON.stringify({ error: 'Error creating product' }), {
       status: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
       },
     });
   }

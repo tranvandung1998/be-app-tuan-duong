@@ -1,29 +1,30 @@
 import pool from '../../../../lib/db';
 
-export const runtime = 'nodejs';
+export const runtime = 'nodejs'; // Bắt buộc nếu chạy trên Vercel
 
-// ✅ Xử lý preflight CORS
+// ✅ Preflight CORS
 export function OPTIONS() {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*', // hoặc FE domain cụ thể
+      'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },
   });
 }
 
-// ✅ API chính - GET grouped products
+// ✅ GET grouped products theo categoryId
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const categoryId = searchParams.get('categoryId');
 
   if (!categoryId) {
-    return new Response('Missing categoryId', {
+    return new Response(JSON.stringify({ error: 'Missing categoryId' }), {
       status: 400,
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
       },
     });
   }
@@ -58,10 +59,11 @@ export async function GET(req) {
     });
   } catch (err) {
     console.error('GET grouped products error:', err);
-    return new Response('Error fetching grouped products', {
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: {
         'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
       },
     });
   }
